@@ -30,6 +30,7 @@
 #ifdef __linux__
 #include <signal.h>
 #include <sys/prctl.h>
+#include <string.h>
 #endif
 
 #include <openthread-core-config.h>
@@ -135,6 +136,33 @@ pseudo_reset:
     assert(instance);
 
     otAppCliInit(instance);
+
+    #ifdef __linux__
+    char commands[60];
+
+    if (strcmp(argv[1], "1") == 0) {
+        strcpy(commands, "dataset init new");
+        otCliInputLine(commands);
+    }
+    
+    strcpy(commands, "dataset networkkey 493973009211ff8ddfc36c7aacbcd8e6");
+    otCliInputLine(commands);
+
+    strcpy(commands, "dataset panid 0x0127");
+    otCliInputLine(commands);
+
+    strcpy(commands, "dataset channel 11");
+    otCliInputLine(commands);
+
+    strcpy(commands, "dataset commit active");
+    otCliInputLine(commands);
+    
+    strcpy(commands, "ifconfig up");
+    otCliInputLine(commands);
+
+    strcpy(commands, "thread start");
+    otCliInputLine(commands);
+#endif
 
 #if OPENTHREAD_POSIX && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
     IgnoreError(otCliSetUserCommands(kCommands, OT_ARRAY_LENGTH(kCommands), instance));
