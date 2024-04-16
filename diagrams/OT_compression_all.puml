@@ -1,0 +1,785 @@
+@startuml
+package [src] as C_0001387619747296316447 {
+package [core] as C_0002278286474666070424 {
+package [thread] as C_0001183054535709160710 {
+class "NetworkData::LowpanContextInfo" as C_0000683747308386236353
+class C_0000683747308386236353 {
++GetPrefix() const : const Ip6::Prefix &
+-GetPrefix() : Ip6::Prefix &
+-SetFrom(const PrefixTlv & aPrefixTlv, const ContextTlv & aContextTlv) : void
+__
+}
+class "Lowpan::Context" as C_0001346570432467457356
+class C_0001346570432467457356 {
+__
++mCompressFlag : bool
++mContextId : uint8_t
++mIsValid : bool
++mPrefix : Ip6::Prefix
+}
+class "Lowpan::Lowpan" as C_0001332924320389650839
+class C_0001332924320389650839 {
++Lowpan(Instance & aInstance) : void
+..
++Compress(Message & aMessage, const Mac::Addresses & aMacAddrs, FrameBuilder & aFrameBuilder) : Error
+-Compress(Message & aMessage, const Mac::Addresses & aMacAddrs, FrameBuilder & aFrameBuilder, uint8_t & aHeaderDepth) : Error
+-CompressDestinationIid(const Mac::Address & aMacAddr, const Ip6::Address & aIpAddr, const Context & aContext, uint16_t & aHcCtl, FrameBuilder & aFrameBuilder) : Error
+-CompressExtensionHeader(Message & aMessage, FrameBuilder & aFrameBuilder, uint8_t & aNextHeader) : Error
+-CompressMulticast(const Ip6::Address & aIpAddr, uint16_t & aHcCtl, FrameBuilder & aFrameBuilder) : Error
+-CompressSourceIid(const Mac::Address & aMacAddr, const Ip6::Address & aIpAddr, const Context & aContext, uint16_t & aHcCtl, FrameBuilder & aFrameBuilder) : Error
+-CompressUdp(Message & aMessage, FrameBuilder & aFrameBuilder) : Error
+{static} -ComputeIid(const Mac::Address & aMacAddr, const Context & aContext, Ip6::InterfaceIdentifier & aIid) : Error
++Decompress(Message & aMessage, const Mac::Addresses & aMacAddrs, FrameData & aFrameData, uint16_t aDatagramLength) : Error
++DecompressBaseHeader(Ip6::Header & aIp6Header, bool & aCompressedNextHeader, const Mac::Addresses & aMacAddrs, FrameData & aFrameData) : Error
++DecompressEcn(const Message & aMessage, uint16_t aOffset) const : Ip6::Ecn
+-DecompressExtensionHeader(Message & aMessage, FrameData & aFrameData) : Error
++DecompressUdpHeader(Ip6::Udp::Header & aUdpHeader, FrameData & aFrameData) : Error
+-DecompressUdpHeader(Message & aMessage, FrameData & aFrameData, uint16_t aDatagramLength) : Error
+-DispatchToNextHeader(uint8_t aDispatch, uint8_t & aNextHeader) : Error
+-FindContextForId(uint8_t aContextId, Context & aContext) const : void
+-FindContextToCompressAddress(const Ip6::Address & aIp6Address, Context & aContext) const : void
+{static} +IsLowpanHc(const FrameData & aFrameData) : bool
+{static} +IsLowpanHc(const uint8_t * aHeader) : bool
++MarkCompressedEcn(Message & aMessage, uint16_t aOffset) : void
+__
+{static} -kEcnMask : const uint8_t
+{static} -kEcnOffset : const uint8_t
+{static} -kExtHdrDispatch : const uint8_t
+{static} -kExtHdrDispatchMask : const uint8_t
+{static} -kExtHdrEidDst : const uint8_t
+{static} -kExtHdrEidFragment : const uint8_t
+{static} -kExtHdrEidHbh : const uint8_t
+{static} -kExtHdrEidIp6 : const uint8_t
+{static} -kExtHdrEidMask : const uint8_t
+{static} -kExtHdrEidMobility : const uint8_t
+{static} -kExtHdrEidRouting : const uint8_t
+{static} -kExtHdrMaxLength : const uint16_t
+{static} -kExtHdrNextHeader : const uint8_t
+{static} -kHcContextId : const uint16_t
+{static} -kHcDispatch : const uint16_t
+{static} -kHcDispatchMask : const uint16_t
+{static} -kHcDstAddrContext : const uint16_t
+{static} -kHcDstAddrMode0 : const uint16_t
+{static} -kHcDstAddrMode1 : const uint16_t
+{static} -kHcDstAddrMode2 : const uint16_t
+{static} -kHcDstAddrMode3 : const uint16_t
+{static} -kHcDstAddrModeMask : const uint16_t
+{static} -kHcFlowLabel : const uint16_t
+{static} -kHcHopLimit1 : const uint16_t
+{static} -kHcHopLimit255 : const uint16_t
+{static} -kHcHopLimit64 : const uint16_t
+{static} -kHcHopLimitMask : const uint16_t
+{static} -kHcMulticast : const uint16_t
+{static} -kHcNextHeader : const uint16_t
+{static} -kHcSrcAddrContext : const uint16_t
+{static} -kHcSrcAddrMode0 : const uint16_t
+{static} -kHcSrcAddrMode1 : const uint16_t
+{static} -kHcSrcAddrMode2 : const uint16_t
+{static} -kHcSrcAddrMode3 : const uint16_t
+{static} -kHcSrcAddrModeMask : const uint16_t
+{static} -kHcTrafficClass : const uint16_t
+{static} -kHcTrafficFlow : const uint16_t
+{static} -kHcTrafficFlowMask : const uint16_t
+{static} -kUdpChecksum : const uint8_t
+{static} -kUdpDispatch : const uint8_t
+{static} -kUdpDispatchMask : const uint8_t
+{static} -kUdpPortMask : const uint8_t
+}
+class "Lowpan::MeshHeader" as C_0001265256160105741077
+class C_0001265256160105741077 {
++AppendTo(FrameBuilder & aFrameBuilder) const : Error
++AppendTo(Message & aMessage) const : Error
++DecrementHopsLeft() : void
++GetDestination() const : uint16_t
++GetHeaderLength() const : uint16_t
++GetHopsLeft() const : uint8_t
++GetSource() const : uint16_t
++Init(uint16_t aSource, uint16_t aDestination, uint8_t aHopsLeft) : void
+{static} +IsMeshHeader(const FrameData & aFrameData) : bool
++ParseFrom(const uint8_t * aFrame, uint16_t aFrameLength, uint16_t & aHeaderLength) : Error
++ParseFrom(FrameData & aFrameData) : Error
++ParseFrom(const Message & aMessage) : Error
++ParseFrom(const Message & aMessage, uint16_t & aHeaderLength) : Error
+__
+{static} -kDeepHopsHeaderLength : const uint16_t
+{static} -kDeepHopsLeft : const uint8_t
+{static} -kDestShort : const uint8_t
+{static} -kDispatch : const uint8_t
+{static} -kDispatchMask : const uint8_t
+{static} -kHopsLeftMask : const uint8_t
+{static} -kMinHeaderLength : const uint16_t
+{static} -kSourceShort : const uint8_t
+-mDestination : uint16_t
+-mHopsLeft : uint8_t
+-mSource : uint16_t
+}
+class "MeshForwarder" as C_0000603590511880671658
+class C_0000603590511880671658 {
++MeshForwarder(Instance & aInstance) : void
+..
+-AnycastRouteLookup(uint8_t aServiceId, AnycastType aType, uint16_t & aMeshDest) const : Error
+-AppendHeaderIe(const Message * aMessage, Mac::TxFrame & aFrame) : void
+-ApplyDirectTxQueueLimit(Message & aMessage) : void
+-CalcFrameVersion(const Neighbor * aNeighbor, bool aIePresent) const : Mac::Frame::Version
+-CalcIePresent(const Message * aMessage) : bool
+-CheckReachability(const FrameData & aFrameData, const Mac::Addresses & aMeshAddrs) : Error
+-ClearReassemblyList() : void
+-EvaluateRoutingCost(uint16_t aDest, uint8_t & aBestCost, uint16_t & aBestDest) const : void
++EvictMessage(Message::Priority aPriority) : Error
+-EvictMessage(Message & aMessage) : void
+-FinalizeMessageDirectTx(Message & aMessage, Error aError) : void
+-FrameToMessage(const FrameData & aFrameData, uint16_t aDatagramSize, const Mac::Addresses & aMacAddrs, Message *& aMessage) : Error
++GetCounters() const : const otIpCounters &
+-GetForwardFramePriority(const FrameData & aFrameData, const Mac::Addresses & aMeshAddrs, Message::Priority & aPriority) : void
+-GetFragmentPriority(Lowpan::FragmentHeader & aFragmentHeader, uint16_t aSrcRloc16, Message::Priority & aPriority) : Error
+-GetFramePriority(const FrameData & aFrameData, const Mac::Addresses & aMacAddrs, Message::Priority & aPriority) : Error
+-GetMacDestinationAddress(const Ip6::Address & aIp6Addr, Mac::Address & aMacAddr) : void
+-GetMacSourceAddress(const Ip6::Address & aIp6Addr, Mac::Address & aMacAddr) : void
++GetMaxTimeInQueue() const : uint32_t
++GetReassemblyQueue() const : const MessageQueue &
++GetRxOnWhenIdle() const : bool
++GetSendQueue() const : const PriorityQueue &
++GetTimeInQueueHistogram(uint16_t & aNumBins, uint32_t & aBinInterval) const : const uint32_t *
+-HandleDatagram(Message & aMessage, const Mac::Address & aMacSource) : Error
+-HandleDiscoverComplete() : void
+-HandleFragment(FrameData & aFrameData, const Mac::Addresses & aMacAddrs, const ThreadLinkInfo & aLinkInfo) : void
+-HandleFrameRequest(Mac::TxFrames & aTxFrames) : Mac::TxFrame *
+-HandleLowpanHC(const FrameData & aFrameData, const Mac::Addresses & aMacAddrs, const ThreadLinkInfo & aLinkInfo) : void
+-HandleMesh(FrameData & aFrameData, const Mac::Address & aMacSource, const ThreadLinkInfo & aLinkInfo) : void
+-HandleReceivedFrame(Mac::RxFrame & aFrame) : void
++HandleResolved(const Ip6::Address & aEid, Error aError) : void
+-HandleSentFrame(Mac::TxFrame & aFrame, Error aError) : void
+-HandleTimeTick() : void
+-HandleTxDelayTimer() : void
+-IsDirectTxQueueOverMaxFrameThreshold() const : bool
+-LogFragmentFrameDrop(Error aError, uint16_t aFrameLength, const Mac::Addresses & aMacAddrs, const Lowpan::FragmentHeader & aFragmentHeader, bool aIsSecure) : void
+-LogFrame(const char * aActionText, const Mac::Frame & aFrame, Error aError) : void
+-LogIp6Message(MessageAction aAction, const Message & aMessage, const Mac::Address * aAddress, Error aError, LogLevel aLogLevel) : void
+-LogIp6SourceDestAddresses(const Ip6::Headers & aHeaders, LogLevel aLogLevel) : void
+-LogLowpanHcFrameDrop(Error aError, uint16_t aFrameLength, const Mac::Addresses & aMacAddrs, bool aIsSecure) : void
+-LogMeshFragmentHeader(MessageAction aAction, const Message & aMessage, const Mac::Address * aMacAddress, Error aError, uint16_t & aOffset, Mac::Addresses & aMeshAddrs, LogLevel aLogLevel) : Error
+-LogMeshIpHeader(const Message & aMessage, uint16_t aOffset, const Mac::Addresses & aMeshAddrs, LogLevel aLogLevel) : void
+-LogMeshMessage(MessageAction aAction, const Message & aMessage, const Mac::Address * aAddress, Error aError, LogLevel aLogLevel) : void
+-LogMessage(MessageAction aAction, const Message & aMessage, Error aError) : void
+-LogMessage(MessageAction aAction, const Message & aMessage) : void
+-LogMessage(MessageAction aAction, const Message & aMessage, Error aError, const Mac::Address * aAddress) : void
+-MessageActionToString(MessageAction aAction, Error aError) : const char *
+-MessagePriorityToString(const Message & aMessage) : const char *
+-PauseMessageTransmissions() : void
+-PrepareDataFrame(Mac::TxFrame & aFrame, Message & aMessage, const Mac::Addresses & aMacAddrs, bool aAddMeshHeader, uint16_t aMeshSource, uint16_t aMeshDest, bool aAddFragHeader) : uint16_t
+-PrepareDataFrameWithNoMeshHeader(Mac::TxFrame & aFrame, Message & aMessage, const Mac::Addresses & aMacAddrs) : uint16_t
+-PrepareEmptyFrame(Mac::TxFrame & aFrame, const Mac::Address & aMacDest, bool aAckRequest) : void
+-PrepareMacHeaders(Mac::TxFrame & aFrame, Mac::Frame::Type aFrameType, const Mac::Addresses & aMacAddr, const Mac::PanIds & aPanIds, Mac::Frame::SecurityLevel aSecurityLevel, Mac::Frame::KeyIdMode aKeyIdMode, const Message * aMessage) : void
+-PrepareNextDirectTransmission() : Message *
+-RemoveAgedMessages() : Error
++RemoveDataResponseMessages() : void
+-RemoveMessageIfNoPendingTx(Message & aMessage) : bool
++RemoveMessages(Child & aChild, Message::SubType aSubType) : void
++ResetCounters() : void
++ResetTimeInQueueStat() : void
+-ResumeMessageTransmissions() : void
+-ScheduleTransmissionTask() : void
+-SendDestinationUnreachable(uint16_t aMeshSource, const Ip6::Headers & aIp6Headers) : void
++SendEmptyMessage() : Error
+-SendIcmpErrorIfDstUnreach(const Message & aMessage, const Mac::Addresses & aMacAddrs) : void
+-SendMesh(Message & aMessage, Mac::TxFrame & aFrame) : void
++SendMessage(OwnedPtr<Message> aMessagePtr) : void
++SetDiscoverParameters(const Mac::ChannelMask & aScanChannels) : void
++SetRxOnWhenIdle(bool aRxOnWhenIdle) : void
++Start() : void
++Stop() : void
+-UpdateEcnOrDrop(Message & aMessage, bool aPreparingToSend) : Error
+-UpdateFragmentPriority(Lowpan::FragmentHeader & aFragmentHeader, uint16_t aFragmentLength, uint16_t aSrcRloc16, Message::Priority aPriority) : void
+-UpdateIp6Route(Message & aMessage) : Error
+-UpdateIp6RouteFtd(const Ip6::Header & aIp6Header, Message & aMessage) : Error
+-UpdateMeshRoute(Message & aMessage) : Error
+-UpdateNeighborLinkFailures(Neighbor & aNeighbor, Error aError, bool aAllowNeighborRemove, uint8_t aFailLimit) : void
+-UpdateNeighborOnSentFrame(Mac::TxFrame & aFrame, Error aError, const Mac::Address & aMacDest, bool aIsDataPoll) : Neighbor *
+-UpdateReassemblyList() : bool
+-UpdateRoutes(const FrameData & aFrameData, const Mac::Addresses & aMeshAddrs) : void
+-UpdateSendMessage(Error aFrameTxError, Mac::Address & aMacDest, Neighbor * aNeighbor) : void
+__
+{static} -kFailedCslDataPollTransmissions : const uint8_t
+{static} -kFailedRouterTransmissions : const uint8_t
+{static} -kMeshHeaderFrameFcsSize : const uint8_t
+{static} -kMeshHeaderFrameMtu : const uint8_t
+{static} -kMeshHeaderHopsLeft : const uint8_t
+{static} -kReassemblyTimeout : const uint8_t
+{static} -kTimeInQueueDropMsg : const uint32_t
+{static} -kTimeInQueueMarkEcn : const uint32_t
+{static} -kTxDelayInterval : const uint32_t
+-mAddMeshHeader : bool
+-mDataPollSender : DataPollSender
+-mDelayNextTx : bool
+-mEnabled : bool
+-mFragTag : uint16_t
+-mFragmentPriorityList : FragmentPriorityList
+-mIndirectSender : IndirectSender
+-mIpCounters : otIpCounters
+-mMacAddrs : Mac::Addresses
+-mMeshDest : uint16_t
+-mMeshSource : uint16_t
+-mMessageNextOffset : uint16_t
+-mReassemblyList : MessageQueue
+-mScheduleTransmissionTask : TxTask
+-mSendBusy : bool
+-mSendMessage : Message *
+-mSendQueue : PriorityQueue
+-mTxDelayTimer : TxDelayTimer
+-mTxPaused : bool
+-mTxQueueStats : TxQueueStats
+}
+class "NetworkData::NetworkData" as C_0000576691251651384823
+class C_0000576691251651384823 {
+__
+}
+class "IndirectSender" as C_0000365511659643489006
+class C_0000365511659643489006 {
+__
+}
+class "Instance" as C_0002074607423113921391
+class C_0002074607423113921391 {
+__
+}
+}
+package [common] as C_0000538251318670428019 {
+class "Message" as C_0000603837953379726446
+class C_0000603837953379726446 {
++AddLqi(uint8_t aLqi) : void
++AddRss(int8_t aRss) : void
++Append<ObjectType>(const ObjectType & aObject) : Error
++AppendBytes(const void * aBuf, uint16_t aLength) : Error
++AppendBytesFromMessage(const Message & aMessage, uint16_t aOffset, uint16_t aLength) : Error
++AppendData<DataLengthType kDataLengthType>(const Data<kDataLengthType> & aData) : Error
++ClearChildMask(uint16_t aChildIndex) : void
++ClearDirectTransmission() : void
++Clone() const : Message *
++Clone(uint16_t aLength) const : Message *
++Compare<ObjectType>(uint16_t aOffset, const ObjectType & aObject) const : _Bool
++CompareBytes(uint16_t aOffset, const Message & aOtherMessage, uint16_t aOtherOffset, uint16_t aLength, ByteMatcher aMatcher = nullptr) const : bool
++CompareBytes(uint16_t aOffset, const void * aBuf, uint16_t aLength, ByteMatcher aMatcher = nullptr) const : bool
++Free() : void
++GetAverageLqi() const : uint8_t
++GetAverageRss() const : int8_t
++GetBufferCount() const : uint8_t
++GetChannel() const : uint8_t
++GetChildMask(uint16_t aChildIndex) const : bool
++GetDatagramTag() const : uint32_t
++GetDoNotEvict() const : bool
+-GetFirstChunk(uint16_t aOffset, uint16_t & aLength, Chunk & aChunk) const : void
+-GetFirstChunk(uint16_t aOffset, uint16_t & aLength, MutableChunk & aChunk) : void
++GetInstance() const : Instance &
++GetLength() const : uint16_t
++GetLinkInfo(ThreadLinkInfo & aLinkInfo) const : Error
++GetLqiAverager() const : const LqiAverager &
++GetMeshDest() const : uint16_t
+-GetMessagePool() const : MessagePool *
++GetMessageQueue() const : MessageQueue *
++GetMulticastLoop() const : bool
++GetNext() const : Message *
+-GetNextChunk(uint16_t & aLength, MutableChunk & aChunk) : void
+-GetNextChunk(uint16_t & aLength, Chunk & aChunk) const : void
++GetOffset() const : uint16_t
++GetOrigin() const : Origin
++GetPanId() const : uint16_t
++GetPriority() const : Priority
++GetPriorityQueue() const : PriorityQueue *
++GetPsduCount() const : uint8_t
+#GetReserved() const : uint16_t
++GetRssAverager() const : const RssAverager &
++GetSubType() const : SubType
++GetTimestamp() const : TimeMilli
++GetTxSuccess() const : bool
++GetType() const : Type
++InsertHeader(uint16_t aOffset, uint16_t aLength) : Error
++IsChildPending() const : bool
++IsDirectTransmission() const : bool
++IsDstPanIdBroadcast() const : bool
+-IsInAQueue() const : bool
++IsLinkSecurityEnabled() const : bool
++IsLoopbackToHostAllowed() const : bool
++IsOriginHostTrusted() const : bool
++IsOriginHostUntrusted() const : bool
++IsOriginThreadNetif() const : bool
++IsResolvingAddress() const : bool
++IsSubTypeMle() const : bool
++IsTimeSync() const : bool
++MoveOffset(int aDelta) : void
+-Next() : Message *&
+-Next() const : Message *const &
+{static} -NextOf(Message * aMessage) : Message *
+{static} -NextOf(const Message * aMessage) : const Message *
++Prepend<ObjectType>(const ObjectType & aObject) : Error
++PrependBytes(const void * aBuf, uint16_t aLength) : Error
+-Prev() : Message *&
+{static} +PriorityToString(Priority aPriority) : const char *
++Read<ObjectType>(uint16_t aOffset, ObjectType & aObject) const : Error
++Read(uint16_t aOffset, void * aBuf, uint16_t aLength) const : Error
++ReadBytes(uint16_t aOffset, void * aBuf, uint16_t aLength) const : uint16_t
++RemoveHeader(uint16_t aOffset, uint16_t aLength) : void
++RemoveHeader(uint16_t aLength) : void
+-ResizeMessage(uint16_t aLength) : Error
++SetChannel(uint8_t aChannel) : void
++SetChildMask(uint16_t aChildIndex) : void
++SetDatagramTag(uint32_t aTag) : void
++SetDirectTransmission() : void
++SetDoNotEvict(bool aDoNotEvict) : void
++SetLength(uint16_t aLength) : Error
++SetLinkSecurityEnabled(bool aEnabled) : void
++SetLoopbackToHostAllowed(bool aAllowLoopbackToHost) : void
+-SetLqiAverager(const LqiAverager & aLqiAverager) : void
++SetMeshDest(uint16_t aMeshDest) : void
+-SetMessagePool(MessagePool * aMessagePool) : void
+-SetMessageQueue(MessageQueue * aMessageQueue) : void
++SetMulticastLoop(bool aMulticastLoop) : void
++SetOffset(uint16_t aOffset) : void
++SetOrigin(Origin aOrigin) : void
++SetPanId(uint16_t aPanId) : void
++SetPriority(Priority aPriority) : Error
+-SetPriorityQueue(PriorityQueue * aPriorityQueue) : void
+#SetReserved(uint16_t aReservedHeader) : void
++SetResolvingAddress(bool aResolvingAddress) : void
+-SetRssAverager(const RssAverager & aRssAverager) : void
++SetSubType(SubType aSubType) : void
++SetTimestamp(TimeMilli aTimestamp) : void
++SetTimestampToNow() : void
++SetTxSuccess(bool aTxSuccess) : void
++SetType(Type aType) : void
++UpdateLinkInfoFrom(const ThreadLinkInfo & aLinkInfo) : void
++Write<ObjectType>(uint16_t aOffset, const ObjectType & aObject) : void
++WriteBytes(uint16_t aOffset, const void * aBuf, uint16_t aLength) : void
++WriteBytesFromMessage(uint16_t aWriteOffset, const Message & aMessage, uint16_t aReadOffset, uint16_t aLength) : void
++WriteData<DataLengthType kDataLengthType>(uint16_t aOffset, const Data<kDataLengthType> & aData) : void
+__
+{static} +kNumPriorities : const uint8_t
+}
+class "FrameData" as C_0000970679022985562567
+class C_0000970679022985562567 {
++CanRead(uint16_t aLength) const : bool
++Read<ObjectType>(ObjectType & aObject) : Error
++ReadBigEndianUint16(uint16_t & aUint16) : Error
++ReadBigEndianUint32(uint32_t & aUint32) : Error
++ReadBytes(void * aBuffer, uint16_t aLength) : Error
++ReadLittleEndianUint16(uint16_t & aUint16) : Error
++ReadLittleEndianUint32(uint32_t & aUint32) : Error
++ReadUint8(uint8_t & aUint8) : Error
++SkipOver(uint16_t aLength) : void
+__
+}
+class "FrameBuilder" as C_0001613647999044296420
+class C_0001613647999044296420 {
++Append<ObjectType>(const ObjectType & aObject) : Error
++AppendBigEndianUint16(uint16_t aUint16) : Error
++AppendBigEndianUint32(uint32_t aUint32) : Error
++AppendBytes(const void * aBuffer, uint16_t aLength) : Error
++AppendBytesFromMessage(const Message & aMessage, uint16_t aOffset, uint16_t aLength) : Error
++AppendLittleEndianUint16(uint16_t aUint16) : Error
++AppendLittleEndianUint32(uint32_t aUint32) : Error
++AppendMacAddress(const Mac::Address & aMacAddress) : Error
++AppendUint8(uint8_t aUint8) : Error
++CanAppend(uint16_t aLength) const : bool
++GetBytes() const : const uint8_t *
++GetLength() const : uint16_t
++GetMaxLength() const : uint16_t
++GetRemainingLength() const : uint16_t
++Init(void * aBuffer, uint16_t aLength) : void
++Insert<ObjectType>(uint16_t aOffset, const ObjectType & aObject) : Error
++InsertBytes(uint16_t aOffset, const void * aBuffer, uint16_t aLength) : Error
++RemoveBytes(uint16_t aOffset, uint16_t aLength) : void
++SetMaxLength(uint16_t aLength) : void
++Write<ObjectType>(uint16_t aOffset, const ObjectType & aObject) : void
++WriteBytes(uint16_t aOffset, const void * aBuffer, uint16_t aLength) : void
+__
+-mBuffer : uint8_t *
+-mLength : uint16_t
+-mMaxLength : uint16_t
+}
+class "ThreadLinkInfo" as C_0001739458148921928763
+class C_0001739458148921928763 {
++GetChannel() const : uint8_t
++GetLqi() const : uint8_t
++GetPanId() const : Mac::PanId
++GetRss() const : int8_t
++IsDstPanIdBroadcast() const : bool
++IsLinkSecurityEnabled() const : bool
++SetFrom(const Mac::RxFrame & aFrame) : void
+__
+}
+}
+package [net] as C_0000215011246174653850 {
+class "Ip6::Header" as C_0002099165682465547464
+class C_0002099165682465547464 {
++GetDestination() const : const Address &
++GetDestination() : Address &
++GetDscp() const : uint8_t
++GetEcn() const : Ecn
++GetFlow() const : uint32_t
++GetHopLimit() const : uint8_t
++GetNextHeader() const : uint8_t
++GetPayloadLength() const : uint16_t
++GetSource() const : const Address &
++GetSource() : Address &
++GetTrafficClass() const : uint8_t
++GetVerionTrafficClassFlow() const : uint32_t
++InitVersionTrafficClassFlow() : void
++IsValid() const : bool
++IsVersion6() const : bool
++ParseFrom(const Message & aMessage) : Error
++SetDestination(const Address & aDestination) : void
++SetDscp(uint8_t aDscp) : void
++SetEcn(Ecn aEcn) : void
++SetFlow(uint32_t aFlow) : void
++SetHopLimit(uint8_t aHopLimit) : void
++SetNextHeader(uint8_t aNextHeader) : void
++SetPayloadLength(uint16_t aLength) : void
++SetSource(const Address & aSource) : void
++SetTrafficClass(uint8_t aTc) : void
++SetVerionTrafficClassFlow(uint32_t aVerTcFlow) : void
+__
+{static} +kDestinationFieldOffset : const uint8_t
+{static} -kDscpMask : const uint16_t
+{static} -kDscpOffset : const uint8_t
+{static} -kEcnMask : const uint8_t
+{static} -kEcnOffset : const uint8_t
+{static} -kFlowMask : const uint32_t
+{static} +kHopLimitFieldOffset : const uint8_t
+{static} +kNextHeaderFieldOffset : const uint8_t
+{static} +kPayloadLengthFieldOffset : const uint8_t
+{static} +kSourceFieldOffset : const uint8_t
+{static} -kTrafficClassMask : const uint16_t
+{static} -kTrafficClassOffset : const uint8_t
+{static} -kVersTcFlowInit : const uint32_t
+{static} -kVersion6 : const uint8_t
+{static} -kVersionMask : const uint8_t
+-mDestination : Address
+-mHopLimit : uint8_t
+-mNextHeader : uint8_t
+-mPayloadLength : uint16_t
+-mSource : Address
+-mVerTcFlow : Header::(anonymous_428478)
+}
+class "Ip6::Ip6" as C_0001018498121270593936
+class C_0001018498121270593936 {
++Ip6(Instance & aInstance) : void
+..
+-AddMplOption(Message & aMessage, Header & aHeader) : Error
+-CleanupFragmentationBuffer() : void
+{static} +DscpToPriority(uint8_t aDscp) : Message::Priority
+{static} +EcnToString(Ecn aEcn) : const char *
+-EnqueueDatagram(Message & aMessage) : void
+-FragmentDatagram(Message & aMessage, uint8_t aIpProto) : Error
++GetSendQueue() const : const PriorityQueue &
++HandleDatagram(OwnedPtr<Message> aMessagePtr, bool aIsReassembled = false) : Error
+-HandleExtensionHeaders(OwnedPtr<Message> & aMessagePtr, MessageInfo & aMessageInfo, Header & aHeader, uint8_t & aNextHeader, bool & aReceive) : Error
+-HandleFragment(Message & aMessage) : Error
+-HandleOptions(Message & aMessage, Header & aHeader, bool & aReceive) : Error
+-HandlePayload(Header & aIp6Header, OwnedPtr<Message> & aMessagePtr, MessageInfo & aMessageInfo, uint8_t aIpProto, Message::Ownership aMessageOwnership) : Error
+-HandleSendQueue() : void
+-HandleTimeTick() : void
+-InsertMplOption(Message & aMessage, Header & aHeader) : Error
+{static} +IpProtoToString(uint8_t aIpProto) : const char *
+-IsOnLink(const Address & aAddress) const : bool
++IsReceiveIp6FilterEnabled() const : bool
++NewMessage(uint16_t aReserved) : Message *
++NewMessage() : Message *
++NewMessage(uint16_t aReserved, const Message::Settings & aSettings) : Message *
++NewMessageFromData(const uint8_t * aData, uint16_t aDataLength, const Message::Settings & aSettings) : Message *
+-PassToHost(OwnedPtr<Message> & aMessagePtr, const MessageInfo & aMessageInfo, uint8_t aIpProto, bool aApplyFilter, bool aReceive, Message::Ownership aMessageOwnership) : Error
+-PrepareMulticastToLargerThanRealmLocal(Message & aMessage, const Header & aHeader) : Error
+{static} -PriorityToDscp(Message::Priority aPriority) : uint8_t
+-RemoveMplOption(Message & aMessage) : Error
+-RouteLookup(const Address & aSource, const Address & aDestination) const : Error
++SelectSourceAddress(MessageInfo & aMessageInfo) const : Error
++SelectSourceAddress(const Address & aDestination) const : const Address *
++SendDatagram(Message & aMessage, MessageInfo & aMessageInfo, uint8_t aIpProto) : Error
+-SendIcmpError(Message & aMessage, Icmp::Header::Type aIcmpType, Icmp::Header::Code aIcmpCode) : void
++SendRaw(OwnedPtr<Message> aMessage) : Error
++SetReceiveDatagramCallback(otIp6ReceiveCallback aCallback, void * aCallbackContext) : void
++SetReceiveIp6FilterEnabled(bool aEnabled) : void
+{static} -TakeOrCopyMessagePtr(OwnedPtr<Message> & aTargetPtr, OwnedPtr<Message> & aMessagePtr, Message::Ownership aMessageOwnership) : Error
+-UpdateReassemblyList() : void
+__
+{static} -kDefaultHopLimit : const uint8_t
+{static} -kIp6ReassemblyTimeout : const uint8_t
+{static} -kMinimalMtu : const uint16_t
+-mIcmp : Icmp
+-mIsReceiveIp6FilterEnabled : bool
+-mMpl : Mpl
+-mReassemblyList : MessageQueue
+-mReceiveIp6DatagramCallback : Callback<otIp6ReceiveCallback>
+-mSendQueue : PriorityQueue
+-mSendQueueTask : SendQueueTask
+-mTcp : Tcp
+-mUdp : Udp
+}
+class "Ip6::Headers" as C_0000274617637055195381
+class C_0000274617637055195381 {
++DecompressFrom(const Message & aMessage, uint16_t aOffset, const Mac::Addresses & aMacAddrs) : Error
++DecompressFrom(const FrameData & aFrameData, const Mac::Addresses & aMacAddrs, Instance & aInstance) : Error
++GetChecksum() const : uint16_t
++GetDestinationAddress() const : const Address &
++GetDestinationPort() const : uint16_t
++GetEcn() const : Ecn
++GetIcmpHeader() const : const Icmp::Header &
++GetIp6Header() const : const Header &
++GetIpProto() const : uint8_t
++GetSourceAddress() const : const Address &
++GetSourcePort() const : uint16_t
++GetTcpHeader() const : const Tcp::Header &
++GetUdpHeader() const : const Udp::Header &
++IsIcmp6() const : bool
++IsTcp() const : bool
++IsUdp() const : bool
++ParseFrom(const Message & aMessage) : Error
+__
+-mHeader : Headers::(anonymous_488478)
+-mIp6Header : Header
+}
+}
+package [coap] as C_0001889813544493651964 {
+class "Coap::Message" as C_0002066399530883052289
+class C_0002066399530883052289 {
++AppendBlockOption(BlockType aType, uint32_t aNum, bool aMore, otCoapBlockSzx aSize) : Error
++AppendContentFormatOption(otCoapOptionContentFormat aContentFormat) : Error
++AppendMaxAgeOption(uint32_t aMaxAge) : Error
++AppendObserveOption(uint32_t aObserve) : Error
++AppendOption(uint16_t aNumber, uint16_t aLength, const void * aValue) : Error
++AppendOptionFromMessage(uint16_t aNumber, uint16_t aLength, const Message & aMessage, uint16_t aOffset) : Error
+-AppendOptionHeader(uint16_t aNumber, uint16_t aLength) : Error
++AppendProxyUriOption(const char * aProxyUri) : Error
++AppendStringOption(uint16_t aNumber, const char * aValue) : Error
++AppendUintOption(uint16_t aNumber, uint32_t aValue) : Error
++AppendUriPathOptions(const char * aUriPath) : Error
++AppendUriQueryOption(const char * aUriQuery) : Error
++Clone(uint16_t aLength) const : Message *
++Clone() const : Message *
++CodeToString() const : const char *
++Finish() : void
++GenerateRandomToken(uint8_t aTokenLength) : Error
++GetBlockWiseBlockNumber() const : uint32_t
++GetBlockWiseBlockSize() const : otCoapBlockSzx
++GetCode() const : uint8_t
++GetHeaderLength() const : uint16_t
+-GetHelpData() : HelpData &
+-GetHelpData() const : const HelpData &
+{static} +GetHelpDataReserved() : uint16_t
++GetMessageId() const : uint16_t
++GetNextCoapMessage() const : const Message *
++GetNextCoapMessage() : Message *
++GetOptionStart() const : uint16_t
+-GetToken() : uint8_t *
++GetToken() const : const uint8_t *
++GetTokenLength() const : uint8_t
++GetType() const : uint8_t
++GetUriPath(char * aUriPath) const : Error
++GetVersion() const : uint8_t
++Init(Type aType, Code aCode, Uri aUri) : Error
++Init() : void
++Init(Type aType, Code aCode) : void
++InitAsPost(const Ip6::Address & aDestination, Uri aUri) : Error
++IsAck() const : bool
++IsConfirmable() const : bool
++IsConfirmablePostRequest() const : bool
++IsDeleteRequest() const : bool
++IsEmpty() const : bool
++IsGetRequest() const : bool
++IsMoreBlocksFlagSet() const : bool
++IsNonConfirmable() const : bool
++IsNonConfirmablePostRequest() const : bool
++IsPostRequest() const : bool
++IsPutRequest() const : bool
++IsRequest() const : bool
++IsReset() const : bool
++IsResponse() const : bool
++IsTokenEqual(const Message & aMessage) const : bool
++ParseHeader() : Error
++ReadBlockOptionValues(uint16_t aBlockType) : Error
++ReadUriPathOptions(char (&)[33] aUriPath) const : Error
++SetBlockWiseBlockNumber(uint32_t aBlockNumber) : void
++SetBlockWiseBlockSize(otCoapBlockSzx aBlockSize) : void
++SetCode(Code aCode) : void
++SetDefaultResponseHeader(const Message & aRequest) : Error
++SetMessageId(uint16_t aMessageId) : void
++SetMoreBlocksFlag(bool aMoreBlocks) : void
++SetPayloadMarker() : Error
++SetToken(const uint8_t * aToken, uint8_t aTokenLength) : Error
++SetTokenFromMessage(const Message & aMessage) : Error
+-SetTokenLength(uint8_t aTokenLength) : void
++SetType(Type aType) : void
++SetVersion(uint8_t aVersion) : void
+-WriteExtendedOptionField(uint16_t aValue, uint8_t *& aBuffer) : uint8_t
+__
+{static} -kBlockMOffset : const uint8_t
+{static} -kBlockNumMax : const uint32_t
+{static} -kBlockNumOffset : const uint8_t
+{static} +kBlockSzxBase : const uint8_t
+{static} -kBlockSzxOffset : const uint8_t
+{static} +kDefaultTokenLength : const uint8_t
+{static} -kHelpDataAlignment : const uint8_t
+{static} -kMaxHeaderLength : const uint16_t
+{static} -kMaxOptionHeaderSize : const uint8_t
+{static} +kMaxReceivedUriPath : const uint8_t
+{static} +kMaxTokenLength : const uint8_t
+{static} -kMinHeaderLength : const uint16_t
+{static} -kObserveMask : const uint32_t
+{static} -kOption1ByteExtension : const uint8_t
+{static} -kOption1ByteExtensionOffset : const uint16_t
+{static} -kOption2ByteExtension : const uint8_t
+{static} -kOption2ByteExtensionOffset : const uint16_t
+{static} -kOptionDeltaMask : const uint8_t
+{static} -kOptionDeltaOffset : const uint8_t
+{static} -kOptionLengthMask : const uint8_t
+{static} -kOptionLengthOffset : const uint8_t
+{static} -kPayloadMarker : const uint8_t
+{static} -kTokenLengthMask : const uint8_t
+{static} -kTokenLengthOffset : const uint8_t
+{static} -kTypeMask : const uint8_t
+{static} -kTypeOffset : const uint8_t
+{static} -kVersion1 : const uint8_t
+{static} -kVersionMask : const uint8_t
+{static} -kVersionOffset : const uint8_t
+}
+}
+package [instance] as C_0000273137096413401361 {
+class "Instance" as C_0002074607423113921391
+class C_0002074607423113921391 {
+-Instance() : void
+..
+-AfterInit() : void
++ErasePersistentInfo() : Error
++FactoryReset() : void
++Finalize() : void
++Get<Type>() : Type &
+{static} +Get() : Instance &
++GetApplicationCoap() : Coap::Coap &
++GetApplicationCoapSecure() : Coap::CoapSecure &
++GetBufferInfo(BufferInfo & aInfo) : void
+{static} +GetHeap() : Utils::Heap &
++GetId() const : uint32_t
+{static} +GetLogLevel() : LogLevel
+{static} +InitSingle() : Instance &
+{static} +IsDnsNameCompressionEnabled() : bool
++IsInitialized() const : bool
++Reset() : void
++ResetBufferInfo() : void
+{static} +SetDnsNameCompressionEnabled(bool aEnabled) : void
+{static} +SetLogLevel(LogLevel aLogLevel) : void
+__
+-mActiveDataset : MeshCoP::ActiveDatasetManager
+-mAddressResolver : AddressResolver
+-mAnnounceBegin : AnnounceBeginServer
+-mAnnounceSender : AnnounceSender
+-mAnycastLocator : AnycastLocator
+-mApplicationBleSecure : Ble::BleSecure
+-mApplicationCoap : Coap::Coap
+-mApplicationCoapSecure : Coap::CoapSecure
+-mBackboneRouterLeader : BackboneRouter::Leader
+-mBorderAgent : MeshCoP::BorderAgent
+-mChannelManager : Utils::ChannelManager
+-mChannelMonitor : Utils::ChannelMonitor
+-mChildSupervisor : ChildSupervisor
+-mCommissioner : MeshCoP::Commissioner
+-mDatasetUpdater : MeshCoP::DatasetUpdater
+-mDhcp6Client : Dhcp6::Client
+-mDhcp6Server : Dhcp6::Server
+-mDiags : FactoryDiags::Diags
+-mDiscoverScanner : Mle::DiscoverScanner
+-mDnsClient : Dns::Client
+-mDnsDso : Dns::Dso
+-mDnssdServer : Dns::ServiceDiscovery::Server
+-mDuaManager : DuaManager
+-mEnergyScan : EnergyScanServer
+-mExtendedPanIdManager : MeshCoP::ExtendedPanIdManager
+-mHistoryTracker : Utils::HistoryTracker
+-mId : uint32_t
+-mIp6 : Ip6::Ip6
+-mIp6Filter : Ip6::Filter
+-mIsInitialized : bool
+-mJamDetector : Utils::JamDetector
+-mJoiner : MeshCoP::Joiner
+-mJoinerRouter : MeshCoP::JoinerRouter
+-mKeyManager : KeyManager
+-mLeader : MeshCoP::Leader
+-mLinkRaw : Mac::LinkRaw
+-mLowpan : Lowpan::Lowpan
+-mMac : Mac::Mac
+-mMbedTls : Crypto::MbedTls
+-mMeshForwarder : MeshForwarder
+-mMessagePool : MessagePool
+-mMleRouter : Mle::MleRouter
+-mMlrManager : MlrManager
+-mNeighborDiscoveryAgent : NeighborDiscovery::Agent
+-mNetworkDataLeader : NetworkData::Leader
+-mNetworkDataLocal : NetworkData::Local
+-mNetworkDataNotifier : NetworkData::Notifier
+-mNetworkDataPublisher : NetworkData::Publisher
+-mNetworkDataServiceManager : NetworkData::Service::Manager
+-mNetworkDiagnosticClient : NetworkDiagnostic::Client
+-mNetworkDiagnosticServer : NetworkDiagnostic::Server
+-mNetworkNameManager : MeshCoP::NetworkNameManager
+-mNotifier : Notifier
+-mPanIdQuery : PanIdQueryServer
+-mPendingDataset : MeshCoP::PendingDatasetManager
+-mPingSender : Utils::PingSender
+-mPowerCalibration : Utils::PowerCalibration
+-mRadio : Radio
+-mRandomManager : Random::Manager
+-mSettings : Settings
+-mSettingsDriver : SettingsDriver
+-mSlaac : Utils::Slaac
+-mSntpClient : Sntp::Client
+-mSrpClient : Srp::Client
+-mSrpClientBuffers : Utils::SrpClientBuffers
+-mSrpServer : Srp::Server
+-mSupervisionListener : SupervisionListener
+-mTaskletScheduler : Tasklet::Scheduler
+-mThreadNetif : ThreadNetif
+-mTimeTicker : TimeTicker
+-mTimerMicroScheduler : TimerMicro::Scheduler
+-mTimerMilliScheduler : TimerMilli::Scheduler
+-mTmfAgent : Tmf::Agent
+-mTmfSecureAgent : Tmf::SecureAgent
+-mUptime : Uptime
+{static} -sDnsNameCompressionEnabled : bool
+{static} -sHeap : Utils::Heap *
+{static} -sLogLevel : LogLevel
+}
+}
+}
+}
+C_0001332924320389650839 ..> C_0002074607423113921391
+C_0001332924320389650839 ..> C_0000970679022985562567
+C_0001332924320389650839 ..> C_0000603837953379726446
+C_0001332924320389650839 ..> C_0001613647999044296420
+C_0001332924320389650839 ..> C_0002099165682465547464
+C_0001332924320389650839 ..> C_0001346570432467457356
+C_0001265256160105741077 ..> C_0000970679022985562567
+C_0001265256160105741077 ..> C_0000603837953379726446
+C_0001265256160105741077 ..> C_0001613647999044296420
+C_0000603590511880671658 ..> C_0000970679022985562567
+C_0000603590511880671658 ..> C_0001739458148921928763
+C_0000603590511880671658 ..> C_0000274617637055195381
+C_0000603590511880671658 ..> C_0002099165682465547464
+C_0000603590511880671658 --> C_0000603837953379726446 : -mSendMessage
+C_0000603590511880671658 o-- C_0000365511659643489006 : -mIndirectSender
+C_0000603590511880671658 <.. C_0001018498121270593936 : +<<friend>>
+C_0000603590511880671658 <.. C_0002074607423113921391 : +<<friend>>
+C_0000603837953379726446 ..> C_0002074607423113921391
+C_0000603837953379726446 ..> C_0001739458148921928763
+C_0001613647999044296420 ..> C_0000603837953379726446
+C_0002099165682465547464 ..> C_0000603837953379726446
+C_0001018498121270593936 ..> C_0000603837953379726446
+C_0001018498121270593936 ..> C_0002099165682465547464
+C_0001018498121270593936 <.. C_0002074607423113921391 : +<<friend>>
+C_0000274617637055195381 ..> C_0000603837953379726446
+C_0000274617637055195381 ..> C_0000970679022985562567
+C_0000274617637055195381 ..> C_0002074607423113921391
+C_0000274617637055195381 o-- C_0002099165682465547464 : -mIp6Header
+C_0000603837953379726446 <|-- C_0002066399530883052289
+C_0002074607423113921391 o-- C_0001018498121270593936 : -mIp6
+C_0002074607423113921391 o-- C_0001332924320389650839 : -mLowpan
+C_0002074607423113921391 o-- C_0000603590511880671658 : -mMeshForwarder
+
+'Generated with clang-uml, version 0.5.1
+'LLVM version Ubuntu clang version 16.0.6 (15)
+@enduml

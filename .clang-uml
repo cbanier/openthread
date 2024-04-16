@@ -1,0 +1,77 @@
+compilation_database_dir: ./build/simulation
+output_directory: diagrams
+diagrams:
+  OT_compression:
+    mermaid:
+      before:
+        - direction LR
+      after:
+        - 'note for {{ alias("inheritable_diagram_options") }} "Options common to all diagram types."'
+        - 'note for {{ alias("config") }} "General options not used by diagrams."'
+    type: class
+    generate_packages: true
+    package_type: directory
+    glob:
+      - src/core/coap/*
+      - src/core/common/*
+      - src/core/instance/*
+      - src/core/mac/*
+      - src/core/net/*
+      - src/core/thread/*
+    using_namespace:
+      - ot
+    include:
+      paths:
+        - src/core/common/error.*
+        - src/core/instance/instance.*
+        - src/core/thread/mesh_forwarder*
+        - src/core/thread/lowpan.*
+        - src/core/thread/mle.*
+        - src/core/thread/network_data_types.*
+        - src/core/net/ip6.*
+        - src/core/net/ip6_headers.*
+        - src/core/net/udp6.*
+        - src/core/common/message.*
+        - src/core/common/frame_builder.*
+        - src/core/common/frame_data.*
+        - src/core/coap/coap.*
+        - src/core/coap/coap_message.*
+      context:
+        - ot::Lowpan::Lowpan
+        - ot::MeshForwarder
+      elements:
+        - ot::Mle::Mle::TxMessage
+        - ot::NetworkData::NetworkData
+        - ot::NetworkData::LowpanContextInfo
+        - ot::Lowpan::Context
+        - ot::Lowpan::Lowpan
+        - ot::Lowpan::MeshHeader
+        - ot::MeshForwarder
+        - ot::Instance
+        - ot::InstanceLocator
+        - ot::FrameBuilder
+        - ot::FrameData
+        - ot::Message
+        - ot::Ip6::Ip6
+        - ot::Ip6::Headers
+        - ot::Ip6::Header
+        - ot::Ip6::Udp::Header
+        - ot::Mac::Frame
+        - ot::Coap::Message
+    exclude:
+      elements:
+        - r: '.*anonymous.*'
+      paths:
+        - src/core/api
+        - src/core/backbone_router
+        - src/core/border_router
+        - src/core/config
+        - src/core/crypto
+        - src/core/diags
+        - src/core/meshcop
+        - src/core/radio
+        - stc/core/utils
+      access:
+        - public
+        - protected
+        - private
