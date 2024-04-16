@@ -44,7 +44,10 @@
 #include "thread/network_data_leader.hpp"
 #include "thread/thread_netif.hpp"
 
+#include "common/logging.hpp"
+
 namespace ot {
+RegisterLogModule("Lowpan");
 namespace Lowpan {
 
 Lowpan::Lowpan(Instance &aInstance)
@@ -238,6 +241,7 @@ Error Lowpan::Compress(Message              &aMessage,
                        FrameBuilder         &aFrameBuilder,
                        uint8_t              &aHeaderDepth)
 {
+    LogNote(RED " -> step into Compress()" RESET); // change place
     Error       error       = kErrorNone;
     uint16_t    startOffset = aMessage.GetOffset();
     uint16_t    hcCtl       = kHcDispatch;
@@ -252,7 +256,6 @@ Error Lowpan::Compress(Message              &aMessage,
     uint8_t     headerMaxDepth = aHeaderDepth;
 
     SuccessOrExit(error = aMessage.Read(aMessage.GetOffset(), ip6Header));
-
     FindContextToCompressAddress(ip6Header.GetSource(), srcContext);
     FindContextToCompressAddress(ip6Header.GetDestination(), dstContext);
 
@@ -301,6 +304,7 @@ Error Lowpan::Compress(Message              &aMessage,
         SuccessOrExit(error = aFrameBuilder.AppendUint8(ip6HeaderBytes[1] & 0x0f));
         SuccessOrExit(error = aFrameBuilder.AppendBytes(ip6HeaderBytes + 2, 2));
     }
+    DumpNote(RED "IPv6 Hdr" RESET, ip6HeaderBytes, sizeof(ip6Header));
 
     // Next Header
     switch (ip6Header.GetNextHeader())
@@ -416,6 +420,7 @@ Error Lowpan::Compress(Message              &aMessage,
     }
 
 exit:
+    DumpNote(RED "6Lowpan" RESET, aFrameBuilder.GetBytes(), aFrameBuilder.GetLength());
     aHeaderDepth = headerDepth;
 
     if (error == kErrorNone)
@@ -427,6 +432,7 @@ exit:
         aMessage.SetOffset(startOffset);
     }
 
+    LogNote(RED " <- step out Compress()" RESET);
     return error;
 }
 
@@ -498,6 +504,8 @@ Error Lowpan::CompressExtensionHeader(Message &aMessage, FrameBuilder &aFrameBui
     aMessage.MoveOffset(len + padLength);
 
 exit:
+    DumpNote("IP6 Extension Hdr", reinterpret_cast<uint8_t *>(&extHeader), sizeof(extHeader));
+
     if (error != kErrorNone)
     {
         aMessage.SetOffset(startOffset);
@@ -515,6 +523,7 @@ Error Lowpan::CompressUdp(Message &aMessage, FrameBuilder &aFrameBuilder)
     uint16_t         destination;
 
     SuccessOrExit(error = aMessage.Read(aMessage.GetOffset(), udpHeader));
+    DumpNote(RED "UDP Hdr" RESET, reinterpret_cast<uint8_t *>(&udpHeader), sizeof(udpHeader));
 
     source      = udpHeader.GetSourcePort();
     destination = udpHeader.GetDestinationPort();
@@ -940,6 +949,8 @@ Error Lowpan::DecompressUdpHeader(Ip6::Udp::Header &aUdpHeader, FrameData &aFram
     error = kErrorNone;
 
 exit:
+    DumpNote(CYAN "UDP Decomp Hdr" RESET, reinterpret_cast<uint8_t *>(&aUdpHeader), sizeof(aUdpHeader));
+
     return error;
 }
 
@@ -972,6 +983,7 @@ Error Lowpan::Decompress(Message              &aMessage,
                          FrameData            &aFrameData,
                          uint16_t              aDatagramLength)
 {
+    LogNote(CYAN "-> step into Decompress()" RESET);
     Error       error = kErrorParse;
     Ip6::Header ip6Header;
     bool        compressed;
@@ -979,7 +991,7 @@ Error Lowpan::Decompress(Message              &aMessage,
     uint16_t    currentOffset = aMessage.GetOffset();
 
     SuccessOrExit(DecompressBaseHeader(ip6Header, compressed, aMacAddrs, aFrameData));
-
+    DumpNote(CYAN "Comp Pkt" RESET, aFrameData.GetBytes(), aFrameData.GetLength());
     SuccessOrExit(aMessage.Append(ip6Header));
     aMessage.MoveOffset(sizeof(ip6Header));
 
@@ -1016,6 +1028,7 @@ Error Lowpan::Decompress(Message              &aMessage,
             ExitNow();
         }
     }
+    DumpNote(CYAN "IPv6 Decomp Hdr" RESET, reinterpret_cast<uint8_t*>(&ip6Header), sizeof(ip6Header));
 
     if (aDatagramLength)
     {
@@ -1032,6 +1045,7 @@ Error Lowpan::Decompress(Message              &aMessage,
     error = kErrorNone;
 
 exit:
+    LogNote(CYAN "<- step out Decompress()" RESET);
     return error;
 }
 

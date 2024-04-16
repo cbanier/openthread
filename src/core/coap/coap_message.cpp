@@ -42,8 +42,13 @@
 #include "common/string.hpp"
 #include "instance/instance.hpp"
 
+//#include "common/log.hpp"
+#include "common/logging.hpp"
+
 namespace ot {
 namespace Coap {
+
+RegisterLogModule("CoapMessage");
 
 void Message::Init(void)
 {
@@ -355,6 +360,7 @@ exit:
 
 Error Message::ParseHeader(void)
 {
+    LogNote(BLUE " -> step into ParseHeader" RESET);
     Error            error = kErrorNone;
     Option::Iterator iterator;
 
@@ -379,6 +385,14 @@ Error Message::ParseHeader(void)
     MoveOffset(GetHelpData().mHeaderLength);
 
 exit:
+    DumpNote(BLUE "CoAP Hdr" RESET, reinterpret_cast<uint8_t*>(&GetHelpData().mHeader), GetHelpData().mHeaderLength); 
+
+    if (GetLength() - iterator.GetPayloadMessageOffset() > 0) {
+        uint16_t coapPayload[20];
+        ReadBytes(iterator.GetPayloadMessageOffset(), coapPayload, GetLength() - iterator.GetPayloadMessageOffset());
+        DumpNote(BLUE "Coap Payload" RESET, coapPayload, GetLength() - iterator.GetPayloadMessageOffset());
+    }
+    LogNote(BLUE " <- step out ParseHeader" RESET);
     return error;
 }
 

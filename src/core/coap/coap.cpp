@@ -40,6 +40,8 @@
 #include "net/udp6.hpp"
 #include "thread/thread_netif.hpp"
 
+#include "common/logging.hpp"
+
 /**
  * @file
  *   This file contains common code base for CoAP client and server.
@@ -109,6 +111,7 @@ Message *CoapBase::NewMessage(const Message::Settings &aSettings)
     Message *message = nullptr;
 
     VerifyOrExit((message = AsCoapMessagePtr(Get<Ip6::Udp>().NewMessage(0, aSettings))) != nullptr);
+    //LogNote(BLUE "otMessage (Ip6::UDP) to Coap::Message" RESET);
     message->SetOffset(0);
 
 exit:
@@ -236,7 +239,6 @@ Error CoapBase::SendMessage(Message                &aMessage,
             SuccessOrExit(error = CacheLastBlockResponse(&aMessage));
         }
 #endif
-
         mResponsesQueue.EnqueueResponse(aMessage, aMessageInfo, aTxParameters);
         break;
     case kTypeReset:
@@ -1047,8 +1049,9 @@ exit:
 
 void CoapBase::Receive(ot::Message &aMessage, const Ip6::MessageInfo &aMessageInfo)
 {
+    LogNote(BLUE "CoapBase::Receive call" RESET);
     Message &message = AsCoapMessage(&aMessage);
-
+    LogNote(BLUE "-> Coap::Message::ParseHeader() call" RESET);
     if (message.ParseHeader() != kErrorNone)
     {
         LogDebg("Failed to parse CoAP header");
@@ -1070,6 +1073,7 @@ void CoapBase::Receive(ot::Message &aMessage, const Ip6::MessageInfo &aMessageIn
 #if OPENTHREAD_CONFIG_OTNS_ENABLE
     Get<Utils::Otns>().EmitCoapReceive(message, aMessageInfo);
 #endif
+    LogNote(BLUE "CoapBase::Receive exit" RESET);
 }
 
 void CoapBase::ProcessReceivedResponse(Message &aMessage, const Ip6::MessageInfo &aMessageInfo)

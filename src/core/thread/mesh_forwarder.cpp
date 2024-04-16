@@ -51,6 +51,8 @@
 #include "thread/mle_router.hpp"
 #include "thread/thread_netif.hpp"
 
+#include "common/logging.hpp"
+
 namespace ot {
 
 RegisterLogModule("MeshForwarder");
@@ -561,7 +563,6 @@ void MeshForwarder::ScheduleTransmissionTask(void)
     {
         mSendMessage->SetTxSuccess(true);
     }
-
     Get<Mac::Mac>().RequestDirectFrameTransmission();
 
 exit:
@@ -802,9 +803,10 @@ Mac::TxFrame *MeshForwarder::HandleFrameRequest(Mac::TxFrames &aTxFrames)
             mSendMessage->SetLinkSecurityEnabled(true);
         }
 #endif
+        LogNote(RED "PrepareDataFrame(...) call" RESET);
         mMessageNextOffset =
             PrepareDataFrame(*frame, *mSendMessage, mMacAddrs, mAddMeshHeader, mMeshSource, mMeshDest, addFragHeader);
-
+        LogNote(RED "PrepareDataFrame(...) exit" RESET);
         if ((mSendMessage->GetSubType() == Message::kSubTypeMleChildIdRequest) && mSendMessage->IsLinkSecurityEnabled())
         {
             LogNote("Child ID Request requires fragmentation, aborting tx");
@@ -894,6 +896,7 @@ uint16_t MeshForwarder::PrepareDataFrame(Mac::TxFrame         &aFrame,
                                          uint16_t              aMeshDest,
                                          bool                  aAddFragHeader)
 {
+    LogNote(RED "-> step into PrepareDataFrame" RESET);
     Mac::Frame::SecurityLevel securityLevel;
     Mac::Frame::KeyIdMode     keyIdMode;
     Mac::PanIds               panIds;
@@ -1020,7 +1023,9 @@ start:
             macAddrs = aMacAddrs;
         }
 
+        LogNote(RED "-> Lowpan::Compress(...) call" RESET);
         SuccessOrAssert(Get<Lowpan::Lowpan>().Compress(aMessage, macAddrs, frameBuilder));
+        LogNote(RED "-> Lowpan::Compress(...) exit" RESET);
 
         frameBuilder.SetMaxLength(maxFrameLength);
 
@@ -1076,7 +1081,13 @@ start:
     // Copy IPv6 Payload
     SuccessOrAssert(frameBuilder.AppendBytesFromMessage(aMessage, aMessage.GetOffset(), payloadLength));
     aFrame.SetPayloadLength(frameBuilder.GetLength());
-
+    
+    // Size doesn't match the payloadLength, i.e, unknown bytes displayed ...
+    // DumpNote("Payload", aFrame.GetPayload(), aFrame.GetPayloadLength());
+    LogNote("Corresponding payload : ");
+    uint16_t payloadBuffer[80]; // Ugly but it correponds to the payload !
+    aMessage.ReadBytes(aMessage.GetOffset(), payloadBuffer, payloadLength);
+    DumpNote("Payload", payloadBuffer, payloadLength);
     nextOffset = aMessage.GetOffset() + payloadLength;
 
     if (nextOffset < aMessage.GetLength())
@@ -1088,7 +1099,7 @@ start:
     }
 
     aMessage.SetOffset(origMsgOffset);
-
+    LogNote(RED "<- step out PrepareDataFrame" RESET);
     return nextOffset;
 }
 
@@ -1619,7 +1630,9 @@ Error MeshForwarder::FrameToMessage(const FrameData      &aFrameData,
     aMessage = Get<MessagePool>().Allocate(Message::kTypeIp6, /* aReserveHeader */ 0, Message::Settings(priority));
     VerifyOrExit(aMessage, error = kErrorNoBufs);
 
+    LogNote(CYAN "Lowpan::Decompress(...) call" RESET);
     SuccessOrExit(error = Get<Lowpan::Lowpan>().Decompress(*aMessage, aMacAddrs, frameData, aDatagramSize));
+    LogNote(CYAN "Lowpan::Decompress(...) exit" RESET);
 
     SuccessOrExit(error = aMessage->AppendData(frameData));
     aMessage->MoveOffset(frameData.GetLength());
